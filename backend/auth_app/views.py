@@ -10,6 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 User = get_user_model()
 
 class RegisterView(APIView):
+    permission_classes = [permissions.AllowAny]
     @extend_schema(
         request=RegisterSerializer,
         responses={201: RegisterSerializer},
@@ -22,24 +23,21 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=400)
 
 class LoginView(APIView):
+    permission_classes = [permissions.AllowAny]
     @extend_schema(
         request=LoginSerializer,
         responses={201: LoginSerializer},
     )
     def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        user = User.objects.filter(username=username).first()
-
-        if user and user.check_password(password):
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                "access": str(refresh.access_token),
-                "refresh": str(refresh)
-            })
-        
-        return Response({"error": "Invalid credentials"}, status=401)
+        user = serializer.validated_data["user"]
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh)
+        })
 
 class MeView(APIView):
     permission_classes = [permissions.IsAuthenticated]

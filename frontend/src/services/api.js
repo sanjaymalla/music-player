@@ -20,17 +20,28 @@ api.interceptors.request.use((config) => {
 
 // ✅ LOGIN
 export const loginUser = async (data) => {
-  return await api.post("/login/", data);
+  try {
+
+    const res =  await api.post("/auth/login/", data);
+    
+    localStorage.setItem("access", res.data.access);
+    localStorage.setItem("refresh", res.data.refresh);
+    
+    return res.data;
+  } catch (err) {
+    console.log("LOGIN ERROR:", err.response?.data);
+    throw err;
+  }
 };
 
 // REGISTER
 export const registerUser = async (data) => {
-    return await api.post("/register/", data);
+    return await api.post("/auth/register/", data);
 }
 
 // ✅ GET CURRENT USER
 export const getMe = async () => {
-  return await api.get("/me/");
+  return await api.get("/auth/me/");
 };
 
 export default api;

@@ -23,8 +23,8 @@ function Login() {
       const res = await loginUser(form);
 
       // 🔐 store BOTH tokens
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
+      localStorage.setItem("access", res.access);
+      localStorage.setItem("refresh", res.refresh);
 
       console.log("Login success:", res.data);
 
